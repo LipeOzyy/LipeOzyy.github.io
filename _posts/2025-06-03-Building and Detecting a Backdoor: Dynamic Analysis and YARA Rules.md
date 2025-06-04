@@ -3,6 +3,7 @@ title: "Building and Detecting a Backdoor: Dynamic Analysis and YARA Rules"
 date: 2025-06-03    
 categories: [Malware]
 tags: [Malware]
+image: "https://i.pinimg.com/736x/d3/f7/41/d3f741e990333aabdd7bee363a0c94d4.jpg"
 ---
 
 # Building and Detecting a Backdoor: Dynamic Analysis and YARA Rules
