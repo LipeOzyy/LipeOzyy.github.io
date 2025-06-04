@@ -1,12 +1,12 @@
 ---
-title: "Process injection (Remote Thread Injection) com Windows APIs"
+title: "Process Injection (Remote Thread Injection) using Windows APIs"
 date: 2025-04-06    
 categories: [Malware]
 tags: [WinAPI]
 image: "https://i.pinimg.com/736x/38/30/91/3830916d80a2fb223c7df7f65fc2c07b.jpg"
 ---
 
-# Process injection (Remote Thread Injection) com Windows APIs
+# Process Injection (Remote Thread Injection) using Windows APIs
 
 In this article, we’re going to explore Process Injection techniques using Windows APIs. The goal is to understand how API functions can be used to inject and execute code inside legitimate processes. I’ll also share some practical examples, mainly using C and C++.
 
