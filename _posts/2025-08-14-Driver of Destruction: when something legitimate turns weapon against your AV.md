@@ -1,0 +1,297 @@
+---
+title: "AES as an Obfuscation Layer in Malware Payloads: Bypassing Windows Defender"
+date: 2025-08-18   
+categories: [Malware]
+tags: [AES-256]
+image: "https://i.pinimg.com/736x/1f/2a/99/1f2a9992d24ab42ea9f708d8538270ec.jpg"
+---
+
+
+# Introduction
+
+In this article, we will explore and implement how AES-256 encryption can be applied to malware payloads, using concepts such as initialization vectors generated randomly on each execution.
+
+## What is the AES Algorithm
+AES (Advanced Encryption Standard) is a symmetric block-based encryption algorithm, meaning it works on fixed blocks of 128 bits (16 bytes), so it always requires an input of 128 bits to produce an output of 128 bits. Being a symmetric algorithm, the same key is used for both encryption and decryption. This model ensures efficiency and high speed, making AES very popular not only in legitimate applications but also in malware that wants to obfuscate its payloads.
+
+### Initialization Vector (IV)
+Before we start the practical example, it is important to understand the concept of the Initialization Vector. The IV is a critical component because, without it, two identical plaintext blocks encrypted with the same key would generate identical ciphertext, allowing pattern analysis attacks. The IV breaks this predictability, ensuring that the output is never the same for identical plaintexts. For malware, it helps obfuscate the payload by creating different ciphertexts on each execution, even if the original payload remains the same.
+
+
+### Exemplo em C:
+```c
+#include <windows.h>
+#include <bcrypt.h>
+#include <stdio.h>
+
+#pragma comment(lib, "bcrypt.lib")
+
+#define KEYSIZE 32   // AES-256
+#define IVSIZE 16    // AES block size
+
+BOOL GenerateRandomBytes(BYTE* buffer, DWORD length) {
+    BCRYPT_ALG_HANDLE hAlg = NULL;
+    BOOL result = FALSE;
+
+    if (BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_RNG_ALGORITHM, NULL, 0) < 0) return FALSE;
+    if (BCryptGenRandom(hAlg, buffer, length, 0) >= 0) result = TRUE;
+    BCryptCloseAlgorithmProvider(hAlg, 0);
+    return result;
+}
+
+void PrintHex(const char* label, BYTE* data, DWORD length) {
+    printf("%s: ", label);
+    for (DWORD i = 0; i < length; i++) printf("%02X ", data[i]);
+    printf("\n");
+}
+
+BOOL EncryptAES_CBC(BYTE* plaintext, DWORD ptSize, BYTE* key, BYTE* iv, BYTE** ciphertext, DWORD* ctSize) {
+    BCRYPT_ALG_HANDLE hAlg = NULL;
+    BCRYPT_KEY_HANDLE hKey = NULL;
+    PBYTE keyObj = NULL;
+    DWORD keyObjSize, cbData, cbCipher = 0;
+    NTSTATUS status;
+
+    status = BCryptOpenAlgorithmProvider(&hAlg, BCRYPT_AES_ALGORITHM, NULL, 0);
+    if (status < 0) return FALSE;
+
+    status = BCryptSetProperty(hAlg, BCRYPT_CHAINING_MODE, (PUCHAR)BCRYPT_CHAIN_MODE_CBC,
+                               sizeof(BCRYPT_CHAIN_MODE_CBC), 0);
+    if (status < 0) return FALSE;
+
+    BCryptGetProperty(hAlg, BCRYPT_OBJECT_LENGTH, (PUCHAR)&keyObjSize, sizeof(DWORD), &cbData, 0);
+    keyObj = (PBYTE)HeapAlloc(GetProcessHeap(), 0, keyObjSize);
+
+    status = BCryptGenerateSymmetricKey(hAlg, &hKey, keyObj, keyObjSize, key, KEYSIZE, 0);
+    if (status < 0) return FALSE;
+
+    status = BCryptEncrypt(hKey, plaintext, ptSize, NULL, iv, IVSIZE, NULL, 0, &cbCipher, BCRYPT_BLOCK_PADDING);
+    if (status < 0) return FALSE;
+
+    *ciphertext = (BYTE*)HeapAlloc(GetProcessHeap(), 0, cbCipher);
+    status = BCryptEncrypt(hKey, plaintext, ptSize, NULL, iv, IVSIZE, *ciphertext, cbCipher, &cbCipher, BCRYPT_BLOCK_PADDING);
+    if (status < 0) return FALSE;
+
+    *ctSize = cbCipher;
+
+    BCryptDestroyKey(hKey);
+    BCryptCloseAlgorithmProvider(hAlg, 0);
+    HeapFree(GetProcessHeap(), 0, keyObj);
+
+    return TRUE;
+}
+
+int main() {
+    BYTE key[KEYSIZE];
+    BYTE iv1[IVSIZE], iv2[IVSIZE];
+    BYTE* ct1 = NULL;
+    BYTE* ct2 = NULL;
+    DWORD ctSize1 = 0, ctSize2 = 0;
+
+    unsigned char Data[] = "AES IV example!";
+
+    GenerateRandomBytes(key, KEYSIZE);
+    GenerateRandomBytes(iv1, IVSIZE);
+    GenerateRandomBytes(iv2, IVSIZE);
+
+    EncryptAES_CBC(Data, sizeof(Data), key, iv1, &ct1, &ctSize1);
+    EncryptAES_CBC(Data, sizeof(Data), key, iv2, &ct2, &ctSize2);
+
+    PrintHex("Ciphertext 1 (IV1)", ct1, ctSize1);
+    PrintHex("Ciphertext 2 (IV2)", ct2, ctSize2);
+
+    HeapFree(GetProcessHeap(), 0, ct1);
+    HeapFree(GetProcessHeap(), 0, ct2);
+    return 0;
+}
+```
+This code basically generates an AES-256 key and two different random IVs, then encrypts the same string twice with the same key using different IVs. The output of the code confirms our theory:
+
+![alt text](/assets/post5/out_iv.png)
+
+## *SimpleEncryption* Function - Practical AES Abstraction
+
+The SimpleEncryption function acts as an initial abstraction for using AES. It is responsible for setting up the necessary environment for encryption, including the initialization of the algorithm provider. In this way, SimpleEncryption offers a simplified interface that allows any developer to apply AES while ensuring all parameters, such as the key, IV, and padding, are correctly handled.
+
+```c
+BOOL SimpleEncryption(
+    IN PVOID pPlainTextData,      
+    IN DWORD sPlainTextSize,       
+    IN PBYTE pKey,                
+    IN PBYTE pIv,                  
+    OUT PVOID* pCipherTextData,  
+    OUT DWORD* sCipherTextSize   
+) {
+    if (pPlainTextData == NULL || sPlainTextSize == 0 || pKey == NULL || pIv == NULL)
+        return FALSE;
+
+    
+    AES Aes = {
+        .pKey        = pKey,
+        .pIv         = pIv,
+        .pPlainText  = pPlainTextData,
+        .dwPlainSize = sPlainTextSize
+    };
+
+    if (!InstallAesEncryption(&Aes)) {
+        return FALSE;
+    }
+
+    *pCipherTextData = Aes.pCipherText;
+    *sCipherTextSize = Aes.dwCipherSize;
+
+    return TRUE;
+}
+```
+
+## *SimpleDecryption* Function
+
+In this scenario, SimpleDecryption is used to reverse this protection, recovering the original payload in the target system's memory only when necessary. This ensures that traditional antivirus signatures and static scanners have a harder time identifying the malicious code.
+
+```c
+BOOL SimpleDecryption(
+    IN PVOID pCipherTextData,      // Dados criptografados
+    IN DWORD sCipherTextSize,      // Tamanho do ciphertext
+    IN PBYTE pKey,                 // Chave AES
+    IN PBYTE pIv,                  // Vetor de inicialização
+    OUT PVOID* pPlainTextData,     // Buffer de saída para plaintext
+    OUT DWORD* sPlainTextSize      // Tamanho do plaintext recuperado
+) {
+    if (pCipherTextData == NULL || sCipherTextSize == 0 || pKey == NULL || pIv == NULL)
+        return FALSE;
+
+    AES Aes = {
+        .pKey        = pKey,
+        .pIv         = pIv,
+        .pCipherText = pCipherTextData,
+        .dwCipherSize = sCipherTextSize
+    };
+
+    // Executa a descriptografia
+    if (!InstallAesDecryption(&Aes)) {
+        return FALSE;
+    }
+
+    // Salva os resultados na saída
+    *pPlainTextData = Aes.pPlainText;
+    *sPlainTextSize = Aes.dwPlainSize;
+
+    return TRUE;
+}
+```
+
+# Bypassing Windows Defender with Obfuscation and AES Encryption
+
+The protection offered by Windows Defender is one of the most common defense layers found in modern Windows systems, using heuristics, signatures, and behavioral monitoring of binaries to identify malicious activity. To bypass Windows Defender, we use the technique of payload obfuscation, specifically AES encryption.
+
+## What Our Code Does
+The program is designed to decrypt a shellcode previously encrypted with AES (CBC mode) using a 32-byte key and a 16-byte initialization vector. After decryption, it prints the shellcode in hexadecimal format:
+
+```c++
+#define NT_SUCCESS(status) (((NTSTATUS)(status)) >= 0)
+constexpr size_t KEYSIZE = 32;
+constexpr size_t IVSIZE = 16;
+```
+We define a macro to check if a Windows operation was successful, and we set the fixed size for the AES key and the initialization vector.
+
+```c++
+class AESDecryptor {
+private:
+    BCRYPT_ALG_HANDLE hAlgorithm{ nullptr };
+    BCRYPT_KEY_HANDLE hKeyHandle{ nullptr };
+    std::vector<BYTE> keyObject;
+
+AESDecryptor(const BYTE* key, const BYTE* iv) : key(iv, iv + IVSIZE) {
+    if (!Initialize(key)) {
+        throw std::runtime_error("Failed to initialize AESDecryptor");
+    }
+}
+~AESDecryptor() {
+    if (hKeyHandle) BCryptDestroyKey(hKeyHandle);
+    if (hAlgorithm) BCryptCloseAlgorithmProvider(hAlgorithm, 0);
+}
+
+```
+This snippet defines `AESDecryptor`, responsible for encapsulating the AES decryption logic. In the private block, the class maintains three internal members: *hAlgorithm*, a handle to the algorithm provider; *hKeyHandle*, a handle to the symmetric key; and *keyObject*, a buffer that stores the memory needed for the key object. The constructor of the `AESDecryptor` class initializes the key and IV, configuring the AES provider and the symmetric key in CBC mode, throwing an exception if it fails. The destructor automatically releases all cryptographic resources, preventing memory leaks.
+
+```c++
+std::vector<BYTE> Decrypt(const BYTE* cipherText, size_t cipherSize, const BYTE* iv) {
+        ULONG cbPlainText = 0;
+
+        NTSTATUS status = BCryptDecrypt(
+            hKeyHandle,
+            const_cast<BYTE*>(cipherText),
+            static_cast<ULONG>(cipherSize),
+            nullptr,
+            const_cast<BYTE*>(iv),
+            IVSIZE,
+            nullptr,
+            0,
+            &cbPlainText,
+            BCRYPT_BLOCK_PADDING
+        );
+
+        if (!NT_SUCCESS(status)) {
+            throw std::runtime_error("BCryptDecrypt failed to get output size");
+        }
+
+        std::vector<BYTE> plainText(cbPlainText);
+
+        ULONG cbResult = 0;
+        status = BCryptDecrypt(
+            hKeyHandle,
+            const_cast<BYTE*>(cipherText),
+            static_cast<ULONG>(cipherSize),
+            nullptr,
+            const_cast<BYTE*>(iv),
+            IVSIZE,
+            plainText.data(),
+            static_cast<ULONG>(plainText.size()),
+            &cbResult,
+            BCRYPT_BLOCK_PADDING
+        );
+
+        if (!NT_SUCCESS(status)) {
+            throw std::runtime_error("BCryptDecrypt failed");
+        }
+
+        return plainText;
+    }
+```
+This snippet defines the `Decrypt` method, which decrypts an AES-CBC data buffer in memory. It calls `BCryptDecrypt` without providing an output buffer to determine the required plaintext size. Then, it allocates a byte vector of the correct size and calls `BCryptDecrypt` again to perform the actual decryption.
+
+```c++
+int main() {
+    BYTE pKey[KEYSIZE] = {...};
+
+    BYTE pIv[IVSIZE] = {...};
+
+    BYTE EncShellcode[] = {...};
+
+    try {
+        AESDecryptor decryptor(pKey, pIv);
+        std::vector<BYTE> plaintext = decryptor.Decrypt(EncShellcode, sizeof(EncShellcode), pIv);
+
+        PrintHexData("Shellcode", plaintext);
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Erro: " << e.what() << std::endl;
+        return -1;
+    }
+
+    std::cout << "[#] Press <Enter> to quit...";
+    std::cin.get();
+    return 0;
+}
+```
+The `main` function defines the AES key, the initialization vector (IV), and the encrypted shellcode, creates an `AESDecryptor` object, and uses its `Decrypt` method to decrypt the shellcode in memory, printing the result in hexadecimal.
+
+## Obfuscation Validation Against Windows Defender
+
+First, I tested the payload without obfuscation to see how Windows Defender reacted:
+![alt text](/assets/post5/shellbruto.png)
+
+Now testing with our obfuscated payload to see how Windows Defender reacted:
+![alt text](/assets/post5/final.png)
+
+When the payload is encrypted with AES, Windows Defender does not immediately recognize the malicious pattern because the shellcode content is obfuscated and does not match known malware signatures. While the code remains encrypted in memory, the suspicious instructions do not appear in a readable form for the antivirus. Only when the shellcode is decrypted at runtime does it assume its real form, but this often happens solely in the process's memory, making it much harder for Defender to detect it before execution.
