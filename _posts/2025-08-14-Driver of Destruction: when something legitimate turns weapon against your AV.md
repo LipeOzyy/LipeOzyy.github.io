@@ -295,3 +295,12 @@ Now testing with our obfuscated payload to see how Windows Defender reacted:
 ![alt text](/assets/post5/final.png)
 
 When the payload is encrypted with AES, Windows Defender does not immediately recognize the malicious pattern because the shellcode content is obfuscated and does not match known malware signatures. While the code remains encrypted in memory, the suspicious instructions do not appear in a readable form for the antivirus. Only when the shellcode is decrypted at runtime does it assume its real form, but this often happens solely in the process's memory, making it much harder for Defender to detect it before execution.
+
+## References
+
+- [AES (Advanced Encryption Standard) Overview](https://csrc.nist.gov/projects/cryptographic-standards-and-guidelines) – Official NIST documentation on AES.  
+- [Windows API Documentation](https://learn.microsoft.com/en-us/windows/win32/api/) – Microsoft official reference for Windows API functions.  
+- [Bypassing Windows Defender](https://www.varonis.com/blog/bypassing-windows-defender/) – Article on techniques to evade Windows Defender detection.  
+- [Malware Development Resources](https://www.malwareunicorn.org/) – Guides and tutorials on malware development and reverse engineering.  
+
+
