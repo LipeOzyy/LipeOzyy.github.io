@@ -3,7 +3,7 @@ title: "Dynamic payload loader in C: downloading and executing shellcode in memo
 date: 2025-10-25   
 categories: [Malware]
 tags: [Malware]
-image: "https://i.pinimg.com/736x/03/78/9e/03789e4a71539296997e4e4afb13a1c5.jpg"
+image: "https://i.pinimg.com/1200x/2c/14/1c/2c141ce3c05039619b6dca4a3ab43fbe.jpg"
 ---
 
 In this post we will explore the development of a loader in C that uses Windows APIs to retrieve a remote payload via HTTP and execute it directly in memory. In this Post obfuscation techniques will not be explored.
