@@ -1,5 +1,5 @@
 ---
-title: "Dynamic payload loader in C: downloading and executing shellcode in memory"
+title: "Dynamic loader in C: Part 1 - downloading and executing shellcode in memory"
 date: 2025-10-25   
 categories: [Malware]
 tags: [Malware]
@@ -90,6 +90,14 @@ Executing the Loader:
 ![alt text](/assets/post7/executando.jpeg)
 ![alt text](/assets/post7/rodou1.jpeg)
 
+## VirusTotal detect: 
+My primary objective for Part 2 of this post is to reduce the detection level as much as possible; if I can't achieve that, a Part 3 will be necessary.
+
+![alt text](/assets/post7/vt_10.png)
+
 ## Demonstration video of my loader being executed
 <iframe width="560" height="315" src="https://www.youtube.com/embed/QbRjGSEm_JU" 
 title="YouTube video" frameborder="0" allowfullscreen></iframe>
+
+## Part 2 coming soon...
+### Dynamic Loader in C — Part II: Obfuscation Techniques for Detection Testing
