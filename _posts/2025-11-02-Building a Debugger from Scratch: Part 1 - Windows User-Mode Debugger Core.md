@@ -76,7 +76,7 @@ Here we enter the initialization of Windows structures.
 STARTUPINFOA is a struct that defines how the process itself will be started.
 ZeroMemory completely clears the structure, ensuring there’s no garbage memory that could interfere with the process.An important field we set is si.cb = sizeof(si), a mandatory field so that Windows can identify the version of the structure being used, without it, the API would fail.
 
-### Preparação de linha de comando
+### Command line preparation
 ```c
 char cmdline[4096];
 if (args && args[0]) {
