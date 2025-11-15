@@ -92,7 +92,7 @@ I observed that the malware initially establishes a TCP connection with a remote
 
 ## Analyzing the Executable’s Main Function with IDA!
 
-[alt text](/assets/Post_9/main.png)
+![alt text](/assets/Post_9/main.png)
 
 Converting the first calls inside the main function into C‑like pseudocode, we obtain the following execution flow:
 
