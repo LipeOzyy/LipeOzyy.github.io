@@ -233,10 +233,6 @@ rule win_nefilim_ransomware_
         $crypto_blob_1 = "P28bYetqAjMJwFdCu5KwgN5PGwkVckpRko+" ascii
         $crypto_blob_2 = "uTCpaWeKoTIK27f4cF8GbrTFtiCBEPGFK" ascii
 
-
-        $nefilim_w = "NEFILIM" wide
-        $nefilim_a = "NEFILIM" ascii
-
         $ransom_note = "NEFILIM-DECRYPT.txt" ascii wide
 
         $rus_seed1 = "ya chubstvuu bol' gde-to v grude, i moi rani v serdce ne zalechit'" ascii
