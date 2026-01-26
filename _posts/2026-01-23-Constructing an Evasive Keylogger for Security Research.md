@@ -151,7 +151,7 @@ void TrackContextChange(DWORD processID, const WCHAR* windowTitle)
 ```
 A change detection algorithm that monitors transitions between applications, creating logical temporal markers in the captured data stream.
 
-## Sistema de mapeamento de teclas
+## Key mapping system
 ```c
 BOOL TransmitData(PVOID dataBuffer, ULONG dataLength)
 {
