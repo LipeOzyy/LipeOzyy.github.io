@@ -1,6 +1,6 @@
 ---
 title: "Constructing an evasive keylogger for security research"
-date: 2025-11-15
+date: 2026-01-23
 categories: [Malware]
 tags: [C, Malware, Engineering, WinAPI, Windows]
 image: "https://i.pinimg.com/736x/6d/e0/32/6de0326357869cf8a921d3fd31270e17.jpg"
