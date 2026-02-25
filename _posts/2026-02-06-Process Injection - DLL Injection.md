@@ -191,7 +191,7 @@ SIZE_T pathSize = (wcslen(dllPath) + 1) * sizeof(wchar_t);
 ```
 The +1 ensures the inclusion of the null terminator, which is necessary for LoadLibraryW to correctly interpret the string.
 
-### Alocação de Memória no Processo Remoto
+### Memory allocation in the remote process
 The next step is to allocate memory within the address space of the remote process:
 
 ```c
