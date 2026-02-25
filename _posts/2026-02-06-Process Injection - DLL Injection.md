@@ -3,7 +3,7 @@ title: "Process Injection - DLL Injection"
 date: 2026-02-06
 categories: [Malware]
 tags: [C, Malware, Engineering, WinAPI, Windows]
-image: "https://i.pinimg.com/736x/74/83/63/748363b46cc0e8e3ecb7976c6cce506c.jpg"
+image: "https://i.pinimg.com/1200x/7b/50/ae/7b50ae1d568455c46bf06411f348e4d1.jpg"
 ---
 ⚠️ **Disclaimer | Educational Purpose Only**
 >
