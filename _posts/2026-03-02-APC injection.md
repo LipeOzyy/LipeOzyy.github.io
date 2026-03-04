@@ -100,5 +100,3 @@ The shellcode used in this code is a classic demonstration payload whose purpose
 
 ## Result
 ![alt image](/assets/APC%20post/result.png)
-
-
