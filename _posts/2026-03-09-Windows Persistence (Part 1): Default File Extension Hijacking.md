@@ -2,7 +2,7 @@
 title: "Windows Persistence (Part 1): Default file extension hijacking"
 date: 2026-03-09
 categories: [Persistence]
-tags: [C, Percistence, Malware, WinAPI, Windows, Bypass, EDR]
+tags: [C, Persistence, Malware, WinAPI, Windows, Bypass, EDR]
 image: "https://i.pinimg.com/1200x/d4/aa/20/d4aa2073fe6345ef4bc47350e9e94358.jpg"
 ---
 
