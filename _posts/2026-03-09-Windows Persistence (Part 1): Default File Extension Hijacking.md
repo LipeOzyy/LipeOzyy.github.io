@@ -26,8 +26,7 @@ Windows provides several mechanisms that can be abused to achieve this goal. Man
 
 ## How does Windows decide which program opens a file?
 To understand the applicability of this technique, it is first necessary to understand the answer to this question, as it reveals several important details about how the system works internally.
-When a user double-clicks a file in Windows, the operating system needs to determine which application should be used to open that specific file type. To simplify this concept, consider the following example:
-- .txt files are usually opened by Notepad
+When a user double-clicks a file, the operating system needs to identify the program associated with that specific file type. For example, .txt files are usually opened by Notepad.
 
 Although this seems conceptually simple from a user's perspective, internally Windows relies on a relatively complex structure to resolve these associations. This information is mainly stored in the following registry key:
 ```
