@@ -74,7 +74,7 @@ powershell -windowstyle hidden C:\Windows\backdoor.ps1 %1
 ```
 In this case, whenever a .txt file is opened, Windows will execute PowerShell and pass the file as an argument to the script. From the user’s perspective, nothing different happens, because Notepad will still open normally with the selected file. However, before that happens, our code will also be executed.
 
-### PoC
+### Proof of Concept (PoC) and final demonstration
 To demonstrate the technique, we can create a simple PowerShell script that executes a payload and then opens the original file. For this, we will create a .ps1 script that performs a connection and then passes the path to Notepad in the following way:
 
 ```
@@ -92,5 +92,7 @@ reg add "HKLM\Software\Classes\txtfile\shell\open\command" /v "(Default)" /t REG
 ```
 Now our persistence is established. Whenever a user clicks on a .txt file, our payload is triggered and the connection is initiated.
 
-![alt image](/assets/file_persist/poc.png)
+### Proof of Concept (PoC) demonstration video
+<iframe width="560" height="315" src="https://www.youtube.com/embed/YquUEQ3QfrA" 
+title="YouTube video" frameborder="0" allowfullscreen></iframe>
 
