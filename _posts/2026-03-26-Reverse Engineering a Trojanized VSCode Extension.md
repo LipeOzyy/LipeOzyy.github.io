@@ -6,7 +6,7 @@ tags: [C, Reverse, Malware, WinAPI, Windows, VScode, BAT, JavaScript]
 image: "https://i.pinimg.com/736x/90/e8/b8/90e8b888eeabb2340fa4aa1676054762.jpg"
 ---
 ## Introduction
-Hello everyone! Since it’s been a long time since I last brought a malware analysis or reverse engineering post, I’ve decided to share a very interesting case today. I’ve been researching something to showcase here and found a campaign where the artifact poses as a VS Code AI assistance extension. On the surface, it promises to be a "free" code generation assistant, but package inspection reveals execution behavior that completely deviates from a legitimate plugin. It features hidden script activation and triggers during the editor's startup, alongside the remote delivery of executable binaries to temporary directories. It essentially acts as a dropper—a basic initial compromise flow that transforms an IDE extension into a staging mechanism for second-stage malware. I hope you enjoy the analysis.
+Hello everyone! Since it’s been a long time since I last brought a malware analysis or reverse engineering post, I’ve decided to share a very interesting case today. I’ve been researching something to showcase here and found a campaign where the artifact poses as a VS Code AI assistance extension. On the surface, it promises to be a "free" code generation assistant, but package inspection reveals execution behavior that completely deviates from a legitimate plugin. It features hidden script activation and triggers during the editor's startup, alongside the remote delivery of executable binaries to temporary directories. It essentially acts as a dropper a basic initial compromise flow that transforms an IDE extension into a staging mechanism for second-stage malware. I hope you enjoy the analysis.
 
 ## VT results:
 ![alt image](/assets/vscode_darkgpt/vt.png)
@@ -38,7 +38,7 @@ function log(msg) {
     fs.appendFileSync(logPath, new Date().toISOString() + ' - ' + msg + '\n');
 }
 ```
-This function implements a logging mechanism within the system's Temp directory. This location is well-known to those who deal with malware daily, as it indicates an attempt to avoid raising suspicion by using a path frequently accessed by many legitimate applications.
+This function implements a logging mechanism within the system's Temp directory. This location is well known to those who deal with malware daily, as it indicates an attempt to avoid raising suspicion by using a path frequently accessed by many legitimate applications.
 
 ```js
 function activate(context) {
