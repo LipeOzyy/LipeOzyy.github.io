@@ -33,7 +33,7 @@ npx asar extract app.asar ./extracted
 # pack
 npx asar pack ./extracted app.asar
 ```
-Entretanto para cenarios de persistencia recomendo a ferramente desenvolvida pela MaldevAcademy chamada [ElectronVulnScanner](https://github.com/Maldev-Academy/ElectronVulnScanner/tree/main).
+However, for persistence scenarios I recommend the tool developed by MaldevAcademy called [ElectronVulnScanner](https://github.com/Maldev-Academy/ElectronVulnScanner/tree/main).
 
 #### Persistence in Electron Applications
 The specific persistence technique that we will explore will be done through ELECTRON_RUN_AS_NODE. There is an internal mechanism called RunAsNode fuse. This fuse controls whether the Electron binary can operate in an alternative mode, in which it stops acting as a graphical application and starts functioning only as a pure Node.js interpreter. In practice, the application's executable starts accepting arguments and JavaScript scripts as if it were node.exe itself.
@@ -41,7 +41,7 @@ To exploit this characteristic, I used the maldev tool to find my target:
 ![alt image](/assets/electron_persistence/vscode_vuln.jpeg)
 
 Later, I modified the environment variable redirecting the execution flow to a JS file that performed payload persistence:
-```ps1
+```powershell
 $env:ELECTRON_RUN_AS_NODE = "1"
 $env:NODE_OPTIONS = "--require C:\persistence_electron.js"
 & "$env:LocalAppData\Programs\Microsoft VS Code\Code.exe"
